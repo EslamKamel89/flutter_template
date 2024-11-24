@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,11 +7,13 @@ import 'package:flutter_template/core/heleprs/snackbar.dart';
 import 'package:flutter_template/core/router/app_router.dart';
 import 'package:flutter_template/core/router/app_routes_names.dart';
 import 'package:flutter_template/core/service_locator/service_locator.dart';
+import 'package:flutter_template/core/static_data/app_strings.dart';
 import 'package:flutter_template/core/themes/theme_cubit.dart';
 import 'package:flutter_template/core/themes/toogle_theme_switch.dart';
 import 'package:flutter_template/core/widgets/bottom_navigation_bar.dart';
 import 'package:flutter_template/core/widgets/default_drawer.dart';
 import 'package:flutter_template/core/widgets/default_screen_padding.dart';
+import 'package:flutter_template/core/widgets/language_selector.dart';
 import 'package:flutter_template/core/widgets/sizer.dart';
 import 'package:intl/intl_standalone.dart';
 
@@ -18,7 +21,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initServiceLocator();
   await findSystemLocale();
-  runApp(const MyApp());
+  await EasyLocalization.ensureInitialized();
+  runApp(
+    EasyLocalization(
+        supportedLocales: const [Locale('en'), Locale('ar')],
+        path: 'assets/langs', // Path to translation files
+        fallbackLocale: const Locale('en'),
+        child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -44,6 +54,9 @@ class MyApp extends StatelessWidget {
             theme: themeCubit.state,
             debugShowCheckedModeBanner: false,
             initialRoute: AppRoutesNames.splashScreen,
+            locale: context.locale,
+            supportedLocales: context.supportedLocales,
+            localizationsDelegates: context.localizationDelegates,
             onGenerateRoute: serviceLocator<AppRouter>().onGenerateRoute,
           );
         }),
@@ -77,20 +90,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: const Icon(Icons.add),
       ),
       drawer: const DefaultDrawer(),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, -2), // changes position of shadow
-            ),
-          ],
-        ),
-        child: defaultbottomNavigationBar(),
-      ),
+      bottomNavigationBar: defaultbottomNavigationBar(),
       body: DefaultScreenPadding(
         child: SingleChildScrollView(
           child: Column(
@@ -106,6 +106,10 @@ class _SplashScreenState extends State<SplashScreen> {
                   ToggleThemeSwitch(),
                 ],
               ),
+              const LanguageSelector(),
+              const Sizer(),
+              Text(AppStrings.WELCOME.tr()),
+              const Sizer(),
               ElevatedButton(
                 onPressed: () {},
                 child: const Text('ElevatedButton'),
