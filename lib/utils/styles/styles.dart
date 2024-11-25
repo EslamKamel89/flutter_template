@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 enum St {
   reg14,
@@ -48,7 +47,7 @@ Text txt(
   String? f,
   Color? c,
   int? maxLines,
-  TextStyle Function()? googleFontCallback = GoogleFonts.notoKufiArabic,
+  TextStyle Function()? googleFontCallback,
   TextAlign? textAlign,
 }) {
   s = s ?? 16.sp;
@@ -132,8 +131,7 @@ Text txt(
   if (googleFontCallback != null) {
     return Text(
       text,
-      style: googleFontCallback()
-          .copyWith(fontSize: s.sp, fontWeight: w, color: c),
+      style: googleFontCallback().copyWith(fontSize: s.sp, fontWeight: w, color: c),
       maxLines: maxLines,
       overflow: TextOverflow.ellipsis,
       textAlign: textAlign,
