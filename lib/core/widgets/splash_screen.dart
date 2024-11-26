@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template/core/extensions/context-extensions.dart';
+import 'package:flutter_template/core/router/app_routes_names.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,7 +23,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _animationController.forward();
     _animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        //TODOD: navigate to main screen
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.of(context).pushNamedAndRemoveUntil(AppRoutesNames.uiComponentScreen, (_) => false);
+        });
       }
     });
   }
