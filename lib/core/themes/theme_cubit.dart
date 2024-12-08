@@ -27,3 +27,7 @@ class ThemeCubit extends Cubit<ThemeData> {
     emit(isDarkMode ? darkTheme : lightTheme);
   }
 }
+
+bool isDarkTheme() {
+  return serviceLocator<SharedPreferences>().getBool(ShPrefKey.isDarkMode) ?? false;
+}

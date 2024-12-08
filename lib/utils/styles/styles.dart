@@ -49,6 +49,7 @@ Text txt(
   int? maxLines,
   TextStyle Function()? googleFontCallback,
   TextAlign? textAlign,
+  double? height , 
 }) {
   s = s ?? 16.sp;
   w = FontWeight.normal;
@@ -131,17 +132,17 @@ Text txt(
   if (googleFontCallback != null) {
     return Text(
       text,
-      style: googleFontCallback().copyWith(fontSize: s.sp, fontWeight: w, color: c),
+      style: googleFontCallback().copyWith(fontSize: s.sp, fontWeight: w, color: c, height: height),
       maxLines: maxLines,
-      overflow: TextOverflow.ellipsis,
+      overflow: maxLines == null ? null : TextOverflow.ellipsis,
       textAlign: textAlign,
     );
   }
   return Text(
     text,
-    style: TextStyle(fontSize: s.sp, fontWeight: w, fontFamily: f, color: c),
+    style: TextStyle(fontSize: s.sp, fontWeight: w, fontFamily: f, color: c, height: height),
     maxLines: maxLines,
-    overflow: TextOverflow.ellipsis,
+    overflow: maxLines == null ? null : TextOverflow.ellipsis,
     textAlign: textAlign,
   );
 }

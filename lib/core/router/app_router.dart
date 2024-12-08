@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template/core/router/app_routes_names.dart';
 import 'package:flutter_template/core/router/middleware.dart';
-import 'package:flutter_template/core/widgets/splash_screen.dart';
+import 'package:flutter_template/core/screens_example/splash_screen/splash_screen.dart';
 import 'package:flutter_template/core/widgets/ui_components_screen.dart';
 
 class AppRouter {

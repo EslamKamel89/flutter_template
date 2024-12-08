@@ -1,0 +1,35 @@
+{
+    //? Themes and Appearance
+    "workbench.colorTheme": "Monokai Classic",
+    "editor.tabSize": 2,
+    "editor.fontFamily": "Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": true,
+    //? Enable Auto-Saving of Files:
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "explorer.autoReveal": true,
+    //? Specify a Default Formatter
+    // "[javascript]": {
+    //     "editor.defaultFormatter": "esbenp.prettier-vscode" // Prettier example
+    // }
+    //? Code IntelliSense and Suggestions
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": true
+    },
+    //? Line Numbers and Guides
+    "editor.lineNumbers": "on",
+    //? Bracket Pairing
+    "editor.matchBrackets": "always",
+    //? Word Wrap
+    "editor.wordWrap": "on",
+    //? Terminal Settings
+    "terminal.integrated.fontSize": 15,
+    "terminal.integrated.defaultProfile.windows": "PowerShell", // Example for Windows
+    //? Prettier-Specific Settings
+    "prettier.singleQuote": true,
+    "prettier.trailingComma": "all",
+    "prettier.printWidth": 80,
+    "editor.guides.indentation": true,
+}
