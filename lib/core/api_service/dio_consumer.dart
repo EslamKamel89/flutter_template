@@ -31,6 +31,7 @@ class DioConsumer extends ApiConsumer {
     Object? data,
     Map<String, dynamic>? queryParameter,
   }) async {
+    dio.options.headers = {"Authorization": 'Bearer ${'token'}', "Accept": "application/json"};
     try {
       if (!(await checkInternet())) {
         throw OfflineException();
@@ -53,6 +54,8 @@ class DioConsumer extends ApiConsumer {
     Map<String, dynamic>? queryParameter,
     bool isFormData = false,
   }) async {
+        dio.options.headers = {"Authorization": 'Bearer ${'token'}', "Accept": "application/json"};
+
     try {
       if (!(await checkInternet())) {
         throw OfflineException();
@@ -75,6 +78,8 @@ class DioConsumer extends ApiConsumer {
     Map<String, dynamic>? queryParameter,
     bool isFormData = false,
   }) async {
+       dio.options.headers = {"Authorization": 'Bearer ${'token'}', "Accept": "application/json"};
+
     try {
       if (!(await checkInternet())) {
         throw OfflineException();
@@ -97,6 +102,8 @@ class DioConsumer extends ApiConsumer {
     Map<String, dynamic>? queryParameter,
     bool isFormData = false,
   }) async {
+    dio.options.headers = {"Authorization": 'Bearer ${'token'}', "Accept": "application/json"};
+
     try {
       if (!(await checkInternet())) {
         throw OfflineException();

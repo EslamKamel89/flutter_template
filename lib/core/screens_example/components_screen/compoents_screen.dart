@@ -29,7 +29,7 @@ class _ComponentScreenState extends State<ComponentScreen> {
         child: const Icon(Icons.add),
       ),
       drawer: const DefaultDrawer(),
-      bottomNavigationBar: defaultbottomNavigationBar(),
+      bottomNavigationBar: DefaultBottomNavigationBar(handleNavigation:(int index){}),
       body: DefaultScreenPadding(
         child: SingleChildScrollView(
           child: Column(
