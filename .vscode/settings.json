@@ -32,4 +32,5 @@
     "prettier.trailingComma": "all",
     "prettier.printWidth": 80,
     "editor.guides.indentation": true,
+    "cmake.sourceDirectory": "D:/windows/my_projects/flutter_template/linux",
 }

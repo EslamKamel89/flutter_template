@@ -1,79 +1,195 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class ProfessionalInfoForm extends StatefulWidget {
+  const ProfessionalInfoForm({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ModernDropdownScreen(),
+  State<ProfessionalInfoForm> createState() => _ProfessionalInfoFormState();
+}
+
+class _ProfessionalInfoFormState extends State<ProfessionalInfoForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  // Controllers for text fields
+  final TextEditingController _licenseNumberController = TextEditingController();
+  final TextEditingController _licenseStateController = TextEditingController();
+  final TextEditingController _universityNameController = TextEditingController();
+  final TextEditingController _highestDegreeController = TextEditingController();
+  final TextEditingController _fieldOfStudyController = TextEditingController();
+  final TextEditingController _graduationYearController = TextEditingController();
+  final TextEditingController _workExperienceController = TextEditingController();
+  final TextEditingController _biographyController = TextEditingController();
+
+  // Date fields
+  DateTime? _licenseIssueDate;
+  DateTime? _licenseExpiryDate;
+
+  // CV upload
+  String? _cvFilePath;
+
+  // Method to pick a date
+  Future<void> _selectDate(BuildContext context, {required bool isIssueDate}) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
     );
+
+    if (pickedDate != null) {
+      setState(() {
+        if (isIssueDate) {
+          _licenseIssueDate = pickedDate;
+        } else {
+          _licenseExpiryDate = pickedDate;
+        }
+      });
+    }
   }
-}
 
-class ModernDropdownScreen extends StatefulWidget {
-  @override
-  _ModernDropdownScreenState createState() => _ModernDropdownScreenState();
-}
-
-class _ModernDropdownScreenState extends State<ModernDropdownScreen> {
-  final List<String> items = [
-    'Option 1',
-    'Option 2',
-    'Option 3',
-    'Option 4',
-  ];
-
-  String? selectedValue;
+  // Method to upload CV
+  Future<void> _uploadCV() async {
+    // Simulating file selection
+    setState(() {
+      _cvFilePath = "sample_cv.pdf"; // Replace with actual file picker logic
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modern Dropdown UI'),
+        title: const Text('Professional Information'),
+        backgroundColor: Colors.blueAccent,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: DropdownButtonFormField<String>(
-            value: selectedValue,
-            isExpanded: true,
-            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue),
-            decoration: InputDecoration(
-              labelText: 'Select an Option',
-              labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField('License Number', _licenseNumberController, 'Enter license number'),
+              _buildTextField('License State', _licenseStateController, 'Enter license state'),
+              _buildDateField(
+                context,
+                'License Issue Date',
+                _licenseIssueDate,
+                isIssueDate: true,
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.blue, width: 1.5),
+              _buildDateField(
+                context,
+                'License Expiry Date',
+                _licenseExpiryDate,
+                isIssueDate: false,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.blue, width: 2),
+              _buildTextField('University Name', _universityNameController, 'Enter university name'),
+              _buildTextField('Highest Degree', _highestDegreeController, 'Enter highest degree'),
+              _buildTextField('Field of Study', _fieldOfStudyController, 'Enter field of study'),
+              _buildTextField(
+                'Graduation Year',
+                _graduationYearController,
+                'Enter graduation year',
+                inputType: TextInputType.number,
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            ),
-            items: items
-                .map((item) => DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item, style: const TextStyle(fontSize: 16)),
-                    ))
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedValue = value;
-              });
-            },
-            validator: (value) => value == null ? 'Please select an option' : null,
+              _buildTextField('Work Experience', _workExperienceController, 'Enter work experience'),
+              _buildBiographyField(),
+              _buildFileUploadField(),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    // Perform save or update actions here
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Data saved successfully!')),
+                    );
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Helper to build text fields
+  Widget _buildTextField(
+      String label, TextEditingController controller, String hint, {TextInputType inputType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: inputType,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+        ),
+        validator: (value) => value == null || value.isEmpty ? '$label is required' : null,
+      ),
+    );
+  }
+
+  // Helper to build date fields
+  Widget _buildDateField(BuildContext context, String label, DateTime? selectedDate,
+      {required bool isIssueDate}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: GestureDetector(
+        onTap: () => _selectDate(context, isIssueDate: isIssueDate),
+        child: AbsorbPointer(
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: label,
+              hintText: selectedDate != null
+                  ? '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}'
+                  : 'Select a date',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+            ),
+            validator: (_) => selectedDate == null ? '$label is required' : null,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper to build biography field
+  Widget _buildBiographyField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: _biographyController,
+        maxLines: 4,
+        decoration: InputDecoration(
+          labelText: 'Biography',
+          hintText: 'Write a brief biography',
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+        ),
+      ),
+    );
+  }
+
+  // Helper to build file upload field
+  Widget _buildFileUploadField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          ElevatedButton(
+            onPressed: _uploadCV,
+            child: Text(_cvFilePath == null ? 'Upload CV' : 'Change CV'),
+          ),
+          const SizedBox(width: 16),
+          if (_cvFilePath != null)
+            Expanded(
+              child: Text(
+                'Selected: $_cvFilePath',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+        ],
       ),
     );
   }

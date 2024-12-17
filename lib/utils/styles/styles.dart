@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 enum St {
+  reg12,
+  semi12,
+  bold12,
   reg14,
   semi14,
   bold14,
@@ -47,14 +51,26 @@ Text txt(
   String? f,
   Color? c,
   int? maxLines,
-  TextStyle Function()? googleFontCallback,
+  TextStyle Function()? googleFontCallback = GoogleFonts.notoKufiArabic,
   TextAlign? textAlign,
-  double? height , 
+  double? height = 1,
 }) {
   s = s ?? 16.sp;
   w = FontWeight.normal;
   if (e != null) {
     switch (e) {
+      case St.semi12:
+        s = 12.sp;
+        w = FontWeight.w600;
+        break;
+      case St.reg12:
+        s = 12.sp;
+        w = FontWeight.normal;
+        break;
+      case St.bold12:
+        s = 12.sp;
+        w = FontWeight.w900;
+        break;
       case St.semi14:
         s = 14.sp;
         w = FontWeight.w600;
