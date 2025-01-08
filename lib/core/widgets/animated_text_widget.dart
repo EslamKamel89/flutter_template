@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -8,12 +9,12 @@ class AnimatedTextWidget extends StatelessWidget {
   final TextStyle? textStyle;
 
   const AnimatedTextWidget({
-    Key? key,
+    super.key,
     required this.text,
     this.letterAnimationDuration = const Duration(milliseconds: 300),
     this.recombineDuration = const Duration(milliseconds: 500),
     this.textStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,6 @@ class AnimatedTextWidget extends StatelessWidget {
           );
         }
 
-        // Build animated letters
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: List.generate(text.length, (index) {
@@ -43,9 +43,7 @@ class AnimatedTextWidget extends StatelessWidget {
                       color: textStyle?.color?.withOpacity(animationProgress),
                     ) ??
                     TextStyle(color: Colors.black.withOpacity(animationProgress)),
-              ).animate()
-                  .fadeIn(duration: letterAnimationDuration)
-                  .scale(
+              ).animate().fadeIn(duration: letterAnimationDuration).scale(
                     duration: letterAnimationDuration,
                     curve: Curves.easeInOutBack,
                   );
@@ -54,37 +52,6 @@ class AnimatedTextWidget extends StatelessWidget {
           }),
         );
       },
-    );
-  }
-}
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Animated Text Example'),
-          backgroundColor: Colors.blueAccent,
-        ),
-        body: Center(
-          child: AnimatedTextWidget(
-            text: 'Flutter Rocks!',
-            textStyle: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueAccent,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
