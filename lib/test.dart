@@ -1,88 +1,149 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-class AnimatedTextWidget extends StatelessWidget {
-  final String text;
-  final Duration letterAnimationDuration;
-  final Duration recombineDuration;
-  final TextStyle? textStyle;
-
-  const AnimatedTextWidget({
-    Key? key,
-    required this.text,
-    this.letterAnimationDuration = const Duration(milliseconds: 300),
-    this.recombineDuration = const Duration(milliseconds: 500),
-    this.textStyle,
-  }) : super(key: key);
-
+class GoogleVisionScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: letterAnimationDuration * text.length + recombineDuration,
-      builder: (context, progress, child) {
-        final visibleCharacters = (progress * text.length).floor();
-        final isRecombining = progress >= 1;
+  _GoogleVisionScreenState createState() => _GoogleVisionScreenState();
+}
 
-        if (isRecombining) {
-          return Text(
-            text,
-            style: textStyle,
-          );
-        }
+class _GoogleVisionScreenState extends State<GoogleVisionScreen> {
+  File? _selectedImage;
+  String? _responseText;
+  bool _isLoading = false;
 
-        // Build animated letters
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: List.generate(text.length, (index) {
-            if (index < visibleCharacters) {
-              final animationProgress = (progress - index / text.length).clamp(0.0, 1.0);
-              return Text(
-                text[index],
-                style: textStyle?.copyWith(
-                      color: textStyle?.color?.withOpacity(animationProgress),
-                    ) ??
-                    TextStyle(color: Colors.black.withOpacity(animationProgress)),
-              ).animate()
-                  .fadeIn(duration: letterAnimationDuration)
-                  .scale(
-                    duration: letterAnimationDuration,
-                    curve: Curves.easeInOutBack,
-                  );
-            }
-            return const SizedBox();
-          }),
-        );
-      },
-    );
+  final ImagePicker _picker = ImagePicker();
+  final String _apiKey = 'YOUR_GOOGLE_VISION_API_KEY'; // Replace with your API key
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+        _responseText = null; // Reset response when a new image is picked
+      });
+    }
   }
-}
 
-void main() {
-  runApp(const MyApp());
-}
+  Future<void> _sendImageToGoogleVision() async {
+    if (_selectedImage == null) return;
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final imageBytes = _selectedImage!.readAsBytesSync();
+      final base64Image = base64Encode(imageBytes);
+
+      final dio = Dio();
+      final response = await dio.post(
+        'https://vision.googleapis.com/v1/images:annotate?key=$_apiKey',
+        options: Options(headers: {'Content-Type': 'application/json'}),
+        data: {
+          "requests": [
+            {
+              "image": {"content": base64Image},
+              "features": [{"type": "TEXT_DETECTION", "maxResults": 10}]
+            }
+          ]
+        },
+      );
+
+      setState(() {
+        _responseText = jsonEncode(response.data);
+      });
+    } catch (e) {
+      setState(() {
+        _responseText = "Error: $e";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Animated Text Example'),
-          backgroundColor: Colors.blueAccent,
-        ),
-        body: Center(
-          child: AnimatedTextWidget(
-            text: 'Flutter Rocks!',
-            textStyle: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueAccent,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Google Vision API"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Animate(
+              effects: [FadeEffect(), ScaleEffect()],
+              child: _selectedImage != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.file(
+                        _selectedImage!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text("No Image Selected"),
+                      ),
+                    ),
             ),
-          ),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _pickImage(ImageSource.camera),
+                  icon: Icon(Icons.camera_alt),
+                  label: Text("Camera"),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _pickImage(ImageSource.gallery),
+                  icon: Icon(Icons.photo),
+                  label: Text("Gallery"),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _selectedImage != null && !_isLoading
+                  ? _sendImageToGoogleVision
+                  : null,
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text("Analyze Image"),
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Animate(
+                  effects: [FadeEffect(duration: 500.ms)],
+                  child: _responseText != null
+                      ? Text(
+                          "Response: $_responseText",
+                          style: TextStyle(fontSize: 14),
+                        )
+                      : Text("Response will appear here.",
+                          style: TextStyle(fontSize: 14)),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
